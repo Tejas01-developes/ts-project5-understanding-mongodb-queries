@@ -131,9 +131,34 @@ export const updateuserage:RequestHandler<{},{},bodytype3>=async(req,resp)=>{
     //    const res= await collection2.find({"marks.subject":"maths",
     //                                       "marks.marks":76
     //    })
-    const res= await collection2.find({"marks.marks":{$all:[80,40,60]}})
+    // const res= await collection2.find({email:{$exists:true}})
 
-      resp.status(200).json({success:true,message:res})
+    let limit:number=2;
+    const pagenumber=Number(req.query.page) || 1
+    const skipamount:number=(pagenumber - 1) * limit
+const result= await collection2.aggregate([
+    // {$match:{email:"j@gmail.com"}},
+    
+    {$unwind:"$marks"},
+    {$match:{"marks.marks":{$gt:60}}},
+    // {$group:{_id:"$email",sub:{$push:"$marks.marks"},totalmarks:{$sum:"$marks.marks"}}},
+    // {$project:{_id:0}}
+
+    // {$lookup:{
+    //     from :"users1",
+    //     localField:"email",
+    //     foreignField:"email",
+    //     as:"result"
+    // }},
+    // {$sort:{"marks.marks":-1}},
+    {$count:"totaloutput"}
+    // {$skip:skipamount},
+    // {$limit:limit}
+    
+])
+    console.log(skipamount)
+
+      resp.status(200).json({result})
       return
         }catch(err){
             throw new Error("get users failed")
