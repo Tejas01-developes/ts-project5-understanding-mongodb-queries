@@ -88,8 +88,12 @@ export const updateuserage:RequestHandler<{},{},bodytype3>=async(req,resp)=>{
 
     export const updatemarksarray:RequestHandler<>=async(req,resp)=>{
         try{
-          const res= await collection2.updateOne({email:"t@gmail.com"},{$push:{marks:{"subject":"hindi","marks":70}}})
-          console.log(res);
+
+        // const res=await collection2.updateOne({email:"j@gmail.com"},{$push:{marks:{"subject":"Hindi","marks":72}}})
+
+        const res=await collection2.updateOne({email:"j@gmail.com"},{$pull:{marks:{"subject":"Hindi","marks":72}}})
+       
+        console.log(res);
           return resp.status(200).json({message:"update succesfull"})
         }catch(err){
             console.log(err)
@@ -133,25 +137,28 @@ export const updateuserage:RequestHandler<{},{},bodytype3>=async(req,resp)=>{
     //    })
     // const res= await collection2.find({email:{$exists:true}})
 
+
     let limit:number=2;
     const pagenumber=Number(req.query.page) || 1
     const skipamount:number=(pagenumber - 1) * limit
 const result= await collection2.aggregate([
     // {$match:{email:"j@gmail.com"}},
     
-    {$unwind:"$marks"},
-    {$match:{"marks.marks":{$gt:60}}},
+    // {$unwind:"$marks"},
+    // {$match:{"marks.marks":{$gt:60}}},
     // {$group:{_id:"$email",sub:{$push:"$marks.marks"},totalmarks:{$sum:"$marks.marks"}}},
     // {$project:{_id:0}}
 
-    // {$lookup:{
-    //     from :"users1",
-    //     localField:"email",
-    //     foreignField:"email",
-    //     as:"result"
-    // }},
+    {$lookup:{
+        from :"users1",
+        localField:"email",
+        foreignField:"email",
+        as:"result"
+    }},
+    {$unwind:"$result"},
+    {$project:{task2:"$result.userid",_id:0}}
     // {$sort:{"marks.marks":-1}},
-    {$count:"totaloutput"}
+    // {$count:"totaloutput"}
     // {$skip:skipamount},
     // {$limit:limit}
     
